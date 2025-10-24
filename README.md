@@ -106,7 +106,6 @@ You must integrate an LLM for the AI Assistant functionality. Choose the option 
 - OpenAI, Anthropic Claude, Google Gemini, or any similar service
 - Configure via environment variables
 - Simpler setup, faster development
-- **We can provide test API keys if needed**
 
 #### Option 2: Local LLM with Ollama (Optional - Bonus Points)
 - If you choose Ollama, include it as a separate Docker service in your `docker-compose.yml`
