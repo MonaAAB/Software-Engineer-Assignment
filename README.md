@@ -43,7 +43,6 @@
 #### Chat Interface
 - Create a chat interface where users can ask questions about courses
 - Clear distinction between user and AI messages
-- Display chat history with proper message styling
 
 #### AI Capabilities
 The AI should have access to the course catalog and be able to:
@@ -55,12 +54,10 @@ The AI should have access to the course catalog and be able to:
 #### Features
 - Message input field with send button
 - Loading indicator for AI responses
-- Scrollable chat history
 
 ### Optional Features
 These are truly optional and will NOT negatively impact your evaluation if skipped:
 - Dark mode toggle
-- Voice input for AI chat
 - Course bookmarking/favorites
 - Chat history persistence
 - Streaming AI responses
@@ -106,6 +103,7 @@ You must integrate an LLM for the AI Assistant functionality. Choose the option 
 - OpenAI, Anthropic Claude, Google Gemini, or any similar service
 - Configure via environment variables
 - Simpler setup, faster development
+- We can provide test API keys if needed
 
 #### Option 2: Local LLM with Ollama (Optional - Bonus Points)
 - If you choose Ollama, include it as a separate Docker service in your `docker-compose.yml`
@@ -140,8 +138,6 @@ The entire project must run using Docker Compose with the following services:
 
 The database consists of two main tables:
 - **courses** - Stores course catalog (20 sample courses included)
-- **chat_history** - Stores AI chat conversations (optional)
-
 ### Schema Definition
 
 **Table: courses**
@@ -168,20 +164,74 @@ CREATE INDEX idx_courses_rating ON courses(rating DESC);
 CREATE INDEX idx_courses_enrollment ON courses(enrollment_count DESC);
 ```
 
-**Table: chat_history** (Optional - for AI conversation persistence)
-```sql
-CREATE TABLE chat_history (
-    id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255),
-    message TEXT NOT NULL,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('user', 'assistant')),
-    course_context INTEGER REFERENCES courses(id) ON DELETE SET NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+### Sample Data Insert Commands
 
--- Indexes
-CREATE INDEX idx_chat_history_user ON chat_history(user_id);
-CREATE INDEX idx_chat_history_created ON chat_history(created_at DESC);
+```sql
+-- Sample course data inserts for StudyMate platform
+-- 20 courses across 4 categories: Programming, Design, Data Science, Business
+
+INSERT INTO courses (name, description, price, image, duration, difficulty, category, instructor, enrollment_count, rating) VALUES
+('Python for Beginners', 'Learn Python programming from scratch. Cover fundamentals including variables, loops, functions, and basic data structures. Perfect for those new to programming.', 49.99, 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400', 20, 'Beginner', 'Programming', 'Dr. Sarah Johnson', 1250, 4.7),
+
+('Advanced React Patterns', 'Master advanced React concepts including hooks, context, performance optimization, and modern design patterns. Build scalable applications with confidence.', 89.99, 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400', 35, 'Advanced', 'Programming', 'Michael Chen', 890, 4.8),
+
+('UI/UX Design Fundamentals', 'Comprehensive introduction to user interface and experience design. Learn design principles, wireframing, prototyping, and user research methodologies.', 69.99, 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400', 25, 'Beginner', 'Design', 'Emma Rodriguez', 2100, 4.6),
+
+('Data Science with Python', 'Explore data analysis, visualization, and machine learning using Python. Work with pandas, numpy, matplotlib, and scikit-learn on real-world datasets.', 99.99, 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400', 45, 'Intermediate', 'Data Science', 'Prof. James Wilson', 1580, 4.9),
+
+('Digital Marketing Mastery', 'Complete guide to digital marketing including SEO, social media marketing, content strategy, email marketing, and analytics. Grow your online presence.', 79.99, 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400', 30, 'Beginner', 'Business', 'Lisa Anderson', 3200, 4.5),
+
+('JavaScript Deep Dive', 'Go beyond basics to understand JavaScript at a fundamental level. Explore closures, prototypes, async programming, and modern ES6+ features.', 74.99, 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=400', 28, 'Intermediate', 'Programming', 'Alex Thompson', 1670, 4.7),
+
+('Figma for Product Design', 'Master Figma from basics to advanced techniques. Create professional designs, build component systems, prototype interactions, and collaborate effectively.', 59.99, 'https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=400', 22, 'Intermediate', 'Design', 'Sophie Turner', 1940, 4.8),
+
+('SQL Database Design', 'Learn relational database design, normalization, complex queries, performance optimization, and best practices for building efficient database systems.', 64.99, 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400', 26, 'Intermediate', 'Programming', 'Dr. Robert Martinez', 1120, 4.6),
+
+('Machine Learning A-Z', 'Comprehensive machine learning course covering supervised and unsupervised learning, neural networks, natural language processing, and computer vision.', 129.99, 'https://images.unsplash.com/photo-1555255707-c07966088b7b?w=400', 60, 'Advanced', 'Data Science', 'Dr. Amanda Foster', 2300, 4.9),
+
+('Business Strategy & Planning', 'Develop strategic thinking skills. Learn market analysis, competitive strategy, business model innovation, and strategic planning frameworks.', 84.99, 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400', 32, 'Intermediate', 'Business', 'John Davidson', 1450, 4.4),
+
+('CSS Grid & Flexbox', 'Master modern CSS layout techniques. Build responsive layouts with Grid and Flexbox. Learn best practices for maintainable stylesheets.', 44.99, 'https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?w=400', 15, 'Beginner', 'Programming', 'Maria Garcia', 2800, 4.7),
+
+('Motion Graphics in After Effects', 'Create stunning animations and motion graphics. Learn keyframing, expressions, effects, and professional workflow for video production.', 94.99, 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400', 38, 'Intermediate', 'Design', 'Chris Williams', 1230, 4.6),
+
+('Data Visualization with D3.js', 'Create interactive, dynamic data visualizations for the web. Master D3.js fundamentals, SVG manipulation, and advanced charting techniques.', 79.99, 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400', 30, 'Advanced', 'Data Science', 'Dr. Nina Patel', 890, 4.8),
+
+('Entrepreneurship Essentials', 'Start your business journey. Learn ideation, validation, business planning, fundraising, and launch strategies from successful entrepreneurs.', 69.99, 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400', 28, 'Beginner', 'Business', 'Mark Stevens', 2650, 4.5),
+
+('Node.js Backend Development', 'Build scalable backend applications with Node.js. Cover Express, databases, authentication, RESTful APIs, and deployment strategies.', 89.99, 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400', 40, 'Intermediate', 'Programming', 'David Kim', 1890, 4.8),
+
+('Graphic Design Principles', 'Foundations of visual communication. Learn typography, color theory, composition, branding, and create professional designs from concept to completion.', 64.99, 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400', 24, 'Beginner', 'Design', 'Rachel Green', 3100, 4.6),
+
+('Deep Learning with TensorFlow', 'Advanced neural networks with TensorFlow. Build CNNs, RNNs, GANs, and transformers. Deploy production-ready deep learning models.', 139.99, 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400', 55, 'Advanced', 'Data Science', 'Prof. Li Wei', 1340, 4.9),
+
+('Financial Analysis for Managers', 'Essential financial skills for decision-makers. Understand financial statements, budgeting, forecasting, and investment analysis.', 94.99, 'https://images.unsplash.com/photo-1554224311-beee4ece6c1f?w=400', 35, 'Intermediate', 'Business', 'Jennifer Walsh', 1760, 4.7),
+
+('TypeScript Masterclass', 'Complete TypeScript guide from basics to advanced types. Build type-safe applications with confidence and leverage TypeScript full power.', 69.99, 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400', 26, 'Intermediate', 'Programming', 'Thomas Anderson', 2150, 4.8),
+
+('3D Design with Blender', 'Create stunning 3D models and animations. Learn modeling, texturing, lighting, and rendering. Perfect for beginners and intermediate users.', 84.99, 'https://images.unsplash.com/photo-1618556450991-2f1af64e8191?w=400', 42, 'Beginner', 'Design', 'Marcus Johnson', 1420, 4.5);
+```
+
+**Verification Query:**
+```sql
+SELECT 
+    category, 
+    COUNT(*) as course_count,
+    ROUND(AVG(rating)::numeric, 2) as avg_rating,
+    ROUND(AVG(price)::numeric, 2) as avg_price
+FROM courses 
+GROUP BY category 
+ORDER BY course_count DESC;
+```
+
+**Expected Output:**
+```
+   category    | course_count | avg_rating | avg_price 
+---------------+--------------+------------+-----------
+ Programming   |            6 |       4.72 |     71.16
+ Design        |            5 |       4.62 |     74.79
+ Data Science  |            4 |       4.88 |    102.49
+ Business      |            4 |       4.53 |     82.24
 ```
 
 ### Sample Data
@@ -398,25 +448,6 @@ Response: 500 Internal Server Error
 }
 ```
 
-#### `GET /api/ai/history/{user_id}` (Optional)
-Get chat history for a user
-```
-Response: 200 OK
-[
-  {
-    "id": 1,
-    "message": "What programming courses...",
-    "role": "user",
-    "created_at": "2024-01-01T12:00:00Z"
-  },
-  {
-    "id": 2,
-    "message": "I recommend...",
-    "role": "assistant",
-    "created_at": "2024-01-01T12:00:05Z"
-  }
-]
-```
 
 ### Course Interactions (Optional)
 
