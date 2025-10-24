@@ -263,7 +263,7 @@ Expected output:
 ### Figma Design Files
 
 **Access the complete UI mockups here:**
-[Figma Design Link - (https://www.figma.com/make/kgVJFGdew88v3CKWZrbChh/StudyMate-Platform-Design?node-id=0-4&t=4jX4ei640WmNhoBo-1)]
+[Figma Design Link - https://www.figma.com/make/kgVJFGdew88v3CKWZrbChh/StudyMate-Platform-Design?node-id=0-4&t=4jX4ei640WmNhoBo-1]
 
 ### UI Design Overview
 
