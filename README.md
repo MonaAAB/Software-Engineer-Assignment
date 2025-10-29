@@ -136,7 +136,7 @@ The entire project must run using Docker Compose with the following services:
 
 ### Overview
 
-The database consists of two main tables:
+The database consist of main table:
 - **courses** - Stores course catalog (20 sample courses included)
 ### Schema Definition
 
